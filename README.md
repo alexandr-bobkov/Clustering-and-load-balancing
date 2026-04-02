@@ -30,9 +30,9 @@ echo "<h1>HELLO FROM SERVER 2</h1>" > /home/user/s2/index.html
 #### На сервере s1
 cd /home/user/s1 && python3 -m http.server 8001 --bind 0.0.0.0 &
 #### На сервере s2
-cd /home/user//s2 && python3 -m http.server 8002 --bind 0.0.0.0 &
+cd /home/user/s2 && python3 -m http.server 8002 --bind 0.0.0.0 &
 ```
-#### Конфигурационный файл haproxy (/etc/haproxy/haproxy.cfg) был отредактирован (добавлены параметры)  для работы на 4 уровне (TCP) с использованием алгоритма Round-robin. Балансировщик принимает запросы на порту 8888 (так как порт 80 занят Nginx).
+#### 2. Конфигурационный файл haproxy (/etc/haproxy/haproxy.cfg) был отредактирован (добавлены параметры)  для работы на 4 уровне (TCP) с использованием алгоритма Round-robin. Балансировщик принимает запросы на порту 8888 (так как порт 80 занят Nginx).
 * **Proxy сервер развернут на 192.168.32.129 где и запущен один из python серверов (на s1)**
 
 ```conf
@@ -51,9 +51,9 @@ backend python_servers
     mode tcp
     # Алгоритм балансировки: по очереди (первый, второй, первый, второй...)
     balance roundrobin
-    # Первый сервер (на локальном IP и порту 8001) с проверкой доступности
+    # Первый сервер (на IP и порту 8001) с проверкой доступности
     server server1 192.168.32.129:8001 check #check -отслеживает жив ли сервер
-    # Второй сервер (на локальном IP и порту 8002) с проверкой доступности
+    # Второй сервер (на IP и порту 8002) с проверкой доступности
     server server2 192.168.32.130:8002 check #check -отслеживает жив ли сервер
 ```
 #### Запустим проверку 
@@ -96,6 +96,70 @@ for i in {1..4}; do curl http://192.168.32.129:8888; done
 ------
 
 ### ОТВЕТ:
+
+## 1. Запуск Python-серверов
+Для имитации трех бэкенд-серверов были созданы две директории с уникальными файлами `index.html`. Серверы запущены на портах >
+
+**Команды запуска:**
+```bash
+# Подготовка файлов на сервере s1 (192.168.32.129) и s2 (192.168.32.130) и s3 (192.168.32.128)
+#### На сервере s1
+mkdir -p /home/user/s1
+#### На сервере s2
+mkdir -p /home/user/s2
+#### На сервере s3
+mkdir -p /home/user/s3
+#### На сервере s1
+echo "<h1>SERVER 1 (Weight 2)</h1>" > /home/user/s1/index.html
+#### На сервере s2
+echo "<h1>SERVER 2 (Weight 3)</h1>" > /home/user/s2/index.html
+#### На сервере s3
+echo "<h1>SERVER 3 (Weight 4)</h1>" > /home/user/s3/index.html
+# Запуск серверов в фоновом режиме
+#### На сервере s1
+cd /home/user/s1 && python3 -m http.server 8002 --bind 0.0.0.0 &
+#### На сервере s2
+cd /home/user/s2 && python3 -m http.server 8002 --bind 0.0.0.0 &
+#### На сервере s3
+cd /home/user/s3 && python3 -m http.server 8002 --bind 0.0.0.0 &
+```
+
+#### 2. Конфигурационный файл haproxy (/etc/haproxy/haproxy.cfg) был отредактирован (добавлены параметры)  для работы на 4 ур>
+* **Proxy сервер развернут на 192.168.32.129 где и запущен один из python серверов (на s1)**
+```conf
+# --- Секция FRONTEND (Прием запросов) ---
+frontend http_frontend
+    # Слушаем на порту 8888 (так как 80 занят nginx)
+    bind *:8888
+    # Указываем 7-й уровень (HTTP), чтобы читать заголовки доменов
+    mode http
+
+    # Создаем ACL (список доступа) с именем "is_example_local"
+    # Проверяем заголовок 'Host' на соответствие домену 'example.local'
+    # Флаг -i делает проверку нечувствительной к регистру
+    acl is_example_local hdr(host) -i example.local
+
+    # Условие: перенаправлять трафик на группу серверов 'weighted_servers',
+    # ТОЛЬКО ЕСЛИ запрос пришел на домен example.local
+    use_backend weighted_servers if is_example_local
+
+# --- Секция BACKEND (Распределение с весами) ---
+backend weighted_servers
+    # Режим должен совпадать с frontend
+    mode http
+    # Алгоритм Round Robin (с учетом весов)
+    balance roundrobin
+
+    # Настройка серверов с указанными весами (weight)
+    # server1 получит 2 запроса из 9 (вес 2)
+    server s1 192.168.32.129:8002 weight 2 check
+    # server2 получит 3 запроса из 9 (вес 3)
+    server s2 192.168.32.130:8002 weight 3 check
+    # server3 получит 4 запроса из 9 (вес 4)
+    server s3 192.168.32.128:8002 weight 4 check
+```
+
+
 
 </details>
 
