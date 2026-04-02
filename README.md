@@ -54,8 +54,14 @@ backend python_servers
     # Второй сервер (на локальном IP и порту 8002) с проверкой доступности
     server server2 192.168.32.130:8002 check #check -отслеживает жив ли сервер
 ```
-#### Запустим проверку ```bash for i in {1..4}; do curl http://localhost:8888; done```
+#### Запустим проверку 
+```bash for i in {1..4}; do curl http://localhost:8888; done```
 
+<summary>Результат проверки на скриншоте</summary>
+<img src="img/1.jpg" width = 100%>
+
+------
+------
 ## Задание 2
 - Запустите две виртуальные машины Linux, установите и настройте сервис Keepalived как в лекции.
 - Настройте любой веб-сервер (например, nginx или simple python server) на двух виртуальных машинах
