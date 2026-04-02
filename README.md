@@ -55,7 +55,8 @@ backend python_servers
     server server2 192.168.32.130:8002 check #check -отслеживает жив ли сервер
 ```
 #### Запустим проверку 
-```bash for i in {1..4}; do curl http://192.168.1.129:8888; done``` (proxy сервер развернут на 192.168.32.129 где и запущен один из pyton серверов (s1)
+```bash for i in {1..4}; do curl http://192.168.1.129:8888; done``` 
+- Proxy сервер развернут на 192.168.32.129 где и запущен один из pyton серверов (на s1)
 
 <summary>Результат проверки на скриншоте</summary>
 <img src="img/2.jpg" width = 100%>
