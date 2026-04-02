@@ -174,6 +174,37 @@ for i in {1..9}; do curl -H "Host: example.local" http://example.local:8888; don
 <summary>Результат проверки обращения по ip на скриншоте</summary>
 <img src="img/4.jpg" width = 100%>
 
+<details>
+<summary>Для себя если два сайта(web ресурса)</summary>
+
+- Допустим, у нас есть два разных проекта: example.local и test.local, тогда конфиг будет:
+
+```conf
+frontend http_frontend
+    bind *:8888
+    mode http
+
+    # 1. Определяем ACL для разных доменов
+    acl host_example hdr(host) -i example.local
+    acl host_test    hdr(host) -i test.local
+
+    # 2. Распределяем трафик по разным бэкендам
+    use_backend servers_example if host_example
+    use_backend servers_test    if host_test
+
+# Бэкенд для первого сайта (с весами)
+backend servers_example
+    mode http
+    balance roundrobin
+    server s1 192.168.32.129:8001 weight 2 check
+    server s2 192.168.32.130:8002 weight 3 check
+
+# Бэкенд для второго сайта (совсем другие серверы)
+backend servers_test
+    mode http
+    server s3 192.168.32.128:8003 check
+```
+	</details>
 
 </details>
 
