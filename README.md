@@ -327,5 +327,17 @@ sudo systemctl restart nginx
 <summary>Результат проверки на скриншоте</summary>
 <img src="img/9.jpg" width = 100%>
 
+<details>
+<summary>Расшифровка результата на скриншоте</summary>
+
+    Первый запрос (/3.jpg):
+        HTTP/1.1 200 OK и Server: nginx.
+        Вывод: Nginx сам нашел картинку в /var/www/images/ и отдал её. HAProxy в этом не участвовал. Цель достигнута.
+    Второй запрос (/):
+        HTTP/1.1 200 OK и Server: nginx.
+        Вывод: Nginx принял запрос, понял, что это не картинка, и пробросил его на HAProxy (proxy_pass). HAProxy в свою очередь забрал ответ у Python-сервера и вернул его вам через Nginx.
+        Обратите внимание: Content-Length: 29 — это как раз размер вашей строки <h1>SERVER X</h1>.
+
+</details>
 
 </details>
