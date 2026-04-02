@@ -168,7 +168,9 @@ for i in {1..9}; do curl -H "Host: example.local" http://example.local:8888; don
 ```
 <summary>Результат проверки на скриншоте</summary>
 <img src="img/3.jpg" width = 100%>
+
 #### Проверим, что не проходят проверки если обращаться по ip адресу, ACL значит отрабатывает, у нас Пропускать запросы, только если в заголовке написано example.local.
+
 <summary>Результат проверки обращения по ip на скриншоте</summary>
 <img src="img/4.jpg" width = 100%>
 
