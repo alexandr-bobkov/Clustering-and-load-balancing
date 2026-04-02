@@ -336,7 +336,7 @@ sudo systemctl restart nginx
     Второй запрос (/):
         HTTP/1.1 200 OK и Server: nginx.
         Вывод: Nginx принял запрос, понял, что это не картинка, и пробросил его на HAProxy (proxy_pass). HAProxy в свою очередь забрал ответ у Python-сервера и вернул его вам через Nginx.
-        Обратите внимание: Content-Length: 29 — это как раз размер вашей строки <h1>SERVER X</h1>.
+        Content-Length: 29 — это как раз размер  строки в ранее созданном файле index.hrml (<h1>SERVER X</h1>).
 
 </details>
 
