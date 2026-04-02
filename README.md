@@ -341,3 +341,99 @@ sudo systemctl restart nginx
 </details>
 
 </details>
+
+------
+------
+
+
+<details>
+<summary><c>Задание 4*</c></summary>
+
+- Запустите 4 simple python сервера на разных портах.
+- Первые два сервера будут выдавать страницу index.html вашего сайта example1.local (в файле index.html напишите example1.local)
+- Вторые два сервера будут выдавать страницу index.html вашего сайта example2.local (в файле index.html напишите example2.local)
+- Настройте два бэкенда HAProxy
+- Настройте фронтенд HAProxy так, чтобы в зависимости от запрашиваемого сайта example1.local или example2.local запросы перенаправлялись на разные бэкенды HAProxy
+- На проверку направьте конфигурационный файл HAProxy, скриншоты, демонстрирующие запросы к разным фронтендам и ответам от разных бэкендов.
+
+
+------
+### ОТВЕТ:
+
+## 1.  Подготовка 4 серверов
+
+- Создаю 4 папки и запускаю серверы. Использую порты 8001-8004. Порты 8001 и 8002 буду использовать на сервере с HAPRoxy чтобы не разворачивать 4 виртуальную машину
+
+
+#### На сервере s1 на котором HAPRoxy (192.168.32.129) создаю 2 каталога и внутри файлы index.html с содержимым:
+```bash
+mkdir -p ~/site1_1 ~/site1_2
+echo "<h1>Welcome to example1.local (Server 1)</h1>" > ~/site1_s1/index.html
+echo "<h1>Welcome to example1.local (Server 2)</h1>" > ~/site1_s2/index.html
+111
+
+#### На сервере s1 запускаю python сервер на портах 8001 и 8002
+```bash
+cd ~/site1_s1 && python3 -m http.server 8001 --bind 0.0.0.0 &
+cd ~/site1_s2 && python3 -m http.server 8002 --bind 0.0.0.0 &
+```
+
+#### На сервере s2 (192.168.32.130) создаю 1 каталог и внутри файлы index.html с содержимым:
+```bash
+mkdir -p ~/site2_s3
+echo "<h1>Welcome to example2.local (Server 3)</h1>" > ~/site2_s3/index.html
+```
+#### На сервере s2 запускаю python сервер на порту 8003
+```bash
+cd ~/site2_s3 && python3 -m http.server 8003 --bind 0.0.0.0 &
+```
+#### На сервере s3 (192.168.32.128) создаю 1 каталог и внутри файлы index.html с содержимым:
+```bash
+mkdir -p ~/site2_s4
+echo "<h1>Welcome to example2.local (Server 4)</h1>" > ~/site2_s4/index.html
+```
+
+#### На сервере s3 запускаю python сервер на порту 8004
+```bash
+cd ~/site2_s4 && python3 -m http.server 8004 --bind 0.0.0.0 &
+```
+
+## 2. Конфигурация HAProxy (на  S1)(192.168.32.129)
+```conf
+frontend main_frontend
+    bind *:8888
+    mode http
+
+    # Настраиваем ACL для разделения по доменам
+    acl is_site1 hdr(host) -i example1.local
+    acl is_site2 hdr(host) -i example2.local
+
+    # Перенаправляем на нужные бэкенды
+    use_backend backend_site1 if is_site1
+    use_backend backend_site2 if is_site2
+
+# Бэкенд для example1.local (оба сервера на этой же машине)
+backend backend_site1
+    mode http
+    balance roundrobin
+    server s1 127.0.0.1:8001 check
+    server s2 127.0.0.1:8002 check
+
+# Бэкенд для example2.local (серверы на удаленных машинах)
+backend backend_site2
+    mode http
+    balance roundrobin
+    server s3 192.168.32.130:8003 check
+    server s4 192.168.32.128:8004 check
+```
+
+
+
+
+
+
+
+
+
+</details>
+
