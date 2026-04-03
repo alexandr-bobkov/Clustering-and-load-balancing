@@ -416,8 +416,8 @@ frontend main_frontend
 backend backend_site1
     mode http
     balance roundrobin
-    server s1 127.0.0.1:8001 check
-    server s2 127.0.0.1:8002 check
+    server s1 192.168.32.129:8001 check
+    server s2 192.168.32.129:8002 check
 
 # Бэкенд для example2.local (серверы на удаленных машинах)
 backend backend_site2
