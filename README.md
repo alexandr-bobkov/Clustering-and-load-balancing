@@ -365,35 +365,36 @@ sudo systemctl restart nginx
 - Создаю 4 папки и запускаю серверы. Использую порты 8001-8004. Порты 8001 и 8002 буду использовать на сервере с HAPRoxy чтобы не разворачивать 4 виртуальную машину
 
 
-#### На сервере s1 на котором HAPRoxy (192.168.32.129) создаю 2 каталога и внутри файлы index.html с содержимым:
+##### На сервере s1 на котором HAPRoxy (192.168.32.129) создаю 2 каталога и внутри файлы index.html с содержимым:
 ```bash
 mkdir -p ~/site1_1 ~/site1_2
 echo "<h1>Welcome to example1.local (Server 1)</h1>" > ~/site1_s1/index.html
 echo "<h1>Welcome to example1.local (Server 2)</h1>" > ~/site1_s2/index.html
 111
+```
 
-#### На сервере s1 запускаю python сервер на портах 8001 и 8002
+##### На сервере s1 запускаю python сервер на портах 8001 и 8002
 ```bash
 cd ~/site1_s1 && python3 -m http.server 8001 --bind 0.0.0.0 &
 cd ~/site1_s2 && python3 -m http.server 8002 --bind 0.0.0.0 &
 ```
 
-#### На сервере s2 (192.168.32.130) создаю 1 каталог и внутри файлы index.html с содержимым:
+##### На сервере s2 (192.168.32.130) создаю 1 каталог и внутри файлы index.html с содержимым:
 ```bash
 mkdir -p ~/site2_s3
 echo "<h1>Welcome to example2.local (Server 3)</h1>" > ~/site2_s3/index.html
 ```
-#### На сервере s2 запускаю python сервер на порту 8003
+##### На сервере s2 запускаю python сервер на порту 8003
 ```bash
 cd ~/site2_s3 && python3 -m http.server 8003 --bind 0.0.0.0 &
 ```
-#### На сервере s3 (192.168.32.128) создаю 1 каталог и внутри файлы index.html с содержимым:
+##### На сервере s3 (192.168.32.128) создаю 1 каталог и внутри файлы index.html с содержимым:
 ```bash
 mkdir -p ~/site2_s4
 echo "<h1>Welcome to example2.local (Server 4)</h1>" > ~/site2_s4/index.html
 ```
 
-#### На сервере s3 запускаю python сервер на порту 8004
+##### На сервере s3 запускаю python сервер на порту 8004
 ```bash
 cd ~/site2_s4 && python3 -m http.server 8004 --bind 0.0.0.0 &
 ```
@@ -426,14 +427,9 @@ backend backend_site2
     server s4 192.168.32.128:8004 check
 ```
 
-### 3. Результат проверки
+## 3. Результат проверки
 <summary>Результат проверки  на скриншоте</summary>
 <img src="img/10.jpg" width = 100%>
-
-
-
-
-
 
 
 
