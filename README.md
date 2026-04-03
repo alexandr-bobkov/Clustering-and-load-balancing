@@ -405,9 +405,8 @@ frontend main_frontend
     mode http
 
     # Настраиваем ACL для разделения по доменам
-    acl is_site1 hdr(host) -i example1.local
-    acl is_site2 hdr(host) -i example2.local
-
+    acl is_site1 base_dom example1.local
+    acl is_site2 base_dom example2.local
     # Перенаправляем на нужные бэкенды
     use_backend backend_site1 if is_site1
     use_backend backend_site2 if is_site2
@@ -426,6 +425,10 @@ backend backend_site2
     server s3 192.168.32.130:8003 check
     server s4 192.168.32.128:8004 check
 ```
+
+### 3. Результат проверки
+<summary>Результат проверки  на скриншоте</summary>
+<img src="img/10.jpg" width = 100%>
 
 
 
